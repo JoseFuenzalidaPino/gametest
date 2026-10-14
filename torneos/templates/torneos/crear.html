@@ -1,0 +1,44 @@
+{% extends 'torneos/base.html' %}
+
+{% block titulo %}Crear Torneo{% endblock %}
+
+{% block contenido %}
+<div class="card shadow">
+    <div class="card-header bg-primary text-white">
+        <h4>Nuevo Torneo</h4>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <!-- Renderiza el formulario con estilo Bootstrap -->
+            <div class="mb-3">
+                {{ form.nombre.label_tag }}
+                {{ form.nombre }}
+            </div>
+            <div class="mb-3">
+                {{ form.videojuego.label_tag }}
+                {{ form.videojuego }}
+            </div>
+            <div class="mb-3">
+                {{ form.fecha.label_tag }}
+                {{ form.fecha }}
+            </div>
+            <div class="mb-3">
+                {{ form.max_participantes.label_tag }}
+                {{ form.max_participantes }}
+            </div>
+            <div class="mb-3">
+                {{ form.descripcion.label_tag }}
+                {{ form.descripcion }}
+            </div>
+            <div class="mb-3">
+                {{ form.estado.label_tag }}
+                {{ form.estado }}
+            </div>
+
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <a href="{% url 'lista_torneos' %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

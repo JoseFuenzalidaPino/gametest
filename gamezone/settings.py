@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 import os
+import socket
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -30,7 +31,27 @@ SECRET_KEY = os.environ.get(
 # DJANGO_DEBUG=0 muestra las páginas de error propias (403/404/500)
 DEBUG = os.environ.get('DJANGO_DEBUG', '1') == '1'
 
-ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+def hosts_de_la_red():
+    """Nombre e IPs de este equipo, para aceptar conexiones desde la red local."""
+    hosts = set()
+    try:
+        nombre = socket.gethostname()
+        hosts.update({nombre, nombre.lower()})
+        hosts.update(socket.gethostbyname_ex(nombre)[2])
+    except OSError:
+        pass
+    try:
+        # IP de la interfaz con la ruta principal (UDP no envía paquetes al "conectar")
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(('10.255.255.255', 1))
+            hosts.add(s.getsockname()[0])
+    except OSError:
+        pass
+    return hosts
+
+
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if h.strip()]
+ALLOWED_HOSTS += ['localhost', '127.0.0.1', *sorted(hosts_de_la_red())]
 
 
 # Application definition
@@ -41,8 +62,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'torneos',  # antes de staticfiles para que su runserver (0.0.0.0) tenga prioridad
     'django.contrib.staticfiles',
-    'torneos',
     'rest_framework', #para la API
 ]
 

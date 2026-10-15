@@ -18,7 +18,7 @@ class TorneoSerializer(serializers.ModelSerializer):
     def validate_fecha(self, fecha):
         cambio = self.instance is None or fecha != self.instance.fecha
         if cambio and fecha < date.today():
-            raise serializers.ValidationError('La fecha no puede ser anterior a hoy..')
+            raise serializers.ValidationError('La fecha no puede ser anterior a hoy.')
         return fecha
 
     def validate_max_participantes(self, maximo):

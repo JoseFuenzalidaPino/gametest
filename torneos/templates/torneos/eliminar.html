@@ -1,0 +1,26 @@
+{% extends 'torneos/base.html' %}
+
+{% block titulo %}Eliminar Torneo{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card shadow border-danger">
+      <div class="card-header bg-danger text-white"><h4 class="mb-0">Eliminar torneo</h4></div>
+      <div class="card-body">
+        <p>¿Seguro que deseas eliminar <strong>{{ torneo.nombre }}</strong> ({{ torneo.videojuego }}, {{ torneo.fecha|date:"d/m/Y" }})?</p>
+        {% with total=torneo.inscritos_count %}
+          {% if total %}
+            <div class="alert alert-warning">Se eliminarán también sus {{ total }} inscripciones y sus resultados.</div>
+          {% endif %}
+        {% endwith %}
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+          <a href="{% url 'detalle_torneo' torneo.id %}" class="btn btn-secondary">Cancelar</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

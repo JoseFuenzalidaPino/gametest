@@ -1,0 +1,11 @@
+{% extends 'torneos/base.html' %}
+{% block titulo %}Página no encontrada{% endblock %}
+
+{% block contenido %}
+<div class="text-center py-5">
+  <h1 class="display-4 fw-bold">404</h1>
+  <p class="lead">El torneo o la página que buscas no existe.</p>
+  <p class="text-muted">Puede que haya sido eliminado o que el enlace sea incorrecto.</p>
+  <a href="{% url 'lista_torneos' %}" class="btn btn-primary">Ver torneos</a>
+</div>
+{% endblock %}

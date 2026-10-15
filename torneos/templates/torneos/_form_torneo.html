@@ -1,0 +1,20 @@
+{% for error in form.non_field_errors %}
+    <div class="alert alert-danger">{{ error }}</div>
+{% endfor %}
+{% if form.errors %}
+    <div class="alert alert-danger">Revisa los campos marcados en rojo.</div>
+{% endif %}
+<form method="post" novalidate>
+    {% csrf_token %}
+    <div class="row">
+        {% for field in form %}
+            <div class="mb-3 {% if field.name == 'descripcion' or field.name == 'nombre' %}col-12{% else %}col-md-6{% endif %}">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% for error in field.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-success">{{ boton }}</button>
+    <a href="{{ cancelar }}" class="btn btn-secondary">Cancelar</a>
+</form>

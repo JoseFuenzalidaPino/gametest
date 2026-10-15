@@ -1,0 +1,1 @@
+<span class="badge {% if torneo.estado == 'DISPONIBLE' %}bg-success{% elif torneo.estado == 'COMPLETO' %}bg-warning text-dark{% elif torneo.estado == 'EN_CURSO' %}bg-primary{% else %}bg-secondary{% endif %}">{{ torneo.get_estado_display }}</span>

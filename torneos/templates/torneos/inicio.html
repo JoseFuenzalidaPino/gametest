@@ -1,0 +1,81 @@
+{% extends 'torneos/base.html' %}
+{% block titulo %}Inicio{% endblock %}
+
+{% block contenido %}
+<h2 class="text-center mb-4">Bienvenido a GameZone 🎮</h2>
+
+<div class="row g-4">
+  <div class="{% if form %}col-lg-8{% else %}col-12{% endif %}">
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md"><div class="card shadow-sm h-100"><div class="card-body text-center">
+        <div class="text-muted small">Torneos</div><div class="fs-3 fw-bold">{{ resumen.total }}</div>
+      </div></div></div>
+      <div class="col-6 col-md"><div class="card shadow-sm h-100"><div class="card-body text-center">
+        <div class="text-muted small">Disponibles</div><div class="fs-3 fw-bold text-success">{{ resumen.disponibles }}</div>
+      </div></div></div>
+      <div class="col-6 col-md"><div class="card shadow-sm h-100"><div class="card-body text-center">
+        <div class="text-muted small">En curso</div><div class="fs-3 fw-bold text-primary">{{ resumen.en_curso }}</div>
+      </div></div></div>
+      <div class="col-6 col-md"><div class="card shadow-sm h-100"><div class="card-body text-center">
+        <div class="text-muted small">Finalizados</div><div class="fs-3 fw-bold text-secondary">{{ resumen.finalizados }}</div>
+      </div></div></div>
+      <div class="col-12 col-md"><div class="card shadow-sm h-100"><div class="card-body text-center">
+        <div class="text-muted small">Jugadores</div><div class="fs-3 fw-bold">{{ resumen.jugadores }}</div>
+      </div></div></div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">Próximos torneos</h4>
+      <a href="{% url 'lista_torneos' %}" class="btn btn-outline-dark btn-sm">Ver todos</a>
+    </div>
+    <div class="row g-3">
+      {% for torneo in proximos %}
+        <div class="col-sm-6 {% if not form %}col-lg-4{% endif %}">
+          <div class="card shadow-sm h-100">
+            <div class="card-body d-flex flex-column">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <h5 class="card-title mb-0">{{ torneo.nombre }}</h5>
+                {% include 'torneos/_estado_badge.html' %}
+              </div>
+              <p class="card-text text-muted mb-1">🎮 {{ torneo.videojuego }}</p>
+              <p class="card-text text-muted mb-1">📅 {{ torneo.fecha|date:"d/m/Y" }}</p>
+              <p class="card-text text-muted">👥 {{ torneo.inscritos }} / {{ torneo.max_participantes }} inscritos</p>
+              <a href="{% url 'detalle_torneo' torneo.id %}" class="btn btn-primary btn-sm mt-auto">Ver detalle</a>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12"><div class="alert alert-info mb-0">No hay torneos próximos por ahora.</div></div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {% if form %}
+  <div class="col-lg-4">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <h4 class="mb-0">Iniciar Sesión</h4>
+      </div>
+      <div class="card-body">
+        {% for error in form.non_field_errors %}
+          <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+        <form method="post" action="{% url 'login' %}" novalidate>
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}">
+          {% for field in form %}
+            <div class="mb-3">
+              <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+              {{ field }}
+              {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary w-100">Entrar</button>
+        </form>
+        <p class="text-center mt-3 mb-0">¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate</a></p>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,4 +1,4 @@
-from .views import es_administrador
+from .roles import es_administrador
 
 
 def roles(request):

@@ -1,0 +1,78 @@
+{% extends 'torneos/base.html' %}
+
+{% block titulo %}{{ torneo.nombre }}{% endblock %}
+
+{% block contenido %}
+<div class="row g-4">
+  <div class="col-lg-7">
+    <div class="card shadow h-100">
+      <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">{{ torneo.nombre }}</h4>
+        {% include 'torneos/_estado_badge.html' %}
+      </div>
+      <div class="card-body">
+        <dl class="row mb-3">
+          <dt class="col-sm-5">Videojuego</dt><dd class="col-sm-7">{{ torneo.videojuego }}</dd>
+          <dt class="col-sm-5">Fecha</dt><dd class="col-sm-7">{{ torneo.fecha|date:"d/m/Y" }}</dd>
+          <dt class="col-sm-5">Participantes</dt><dd class="col-sm-7">{{ inscripciones|length }} / {{ torneo.max_participantes }}</dd>
+          <dt class="col-sm-5">Cupos libres</dt><dd class="col-sm-7">{{ cupos_libres }}</dd>
+        </dl>
+        <h6>Descripción</h6>
+        <p class="mb-4">{{ torneo.descripcion|linebreaksbr }}</p>
+
+        <div class="d-flex flex-wrap gap-2">
+          {% if user.is_authenticated %}
+            {% if inscrito %}
+              <span class="btn btn-outline-success disabled">✔ Ya estás inscrito</span>
+            {% elif torneo.admite_inscripciones and cupos_libres > 0 %}
+              <form method="post" action="{% url 'inscribirse_torneo' torneo.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Inscribirse</button>
+              </form>
+            {% else %}
+              <span class="btn btn-outline-secondary disabled">Inscripciones cerradas</span>
+            {% endif %}
+          {% else %}
+            <a href="{% url 'login' %}?next={{ request.path|urlencode }}" class="btn btn-secondary">Inicia sesión para inscribirte</a>
+          {% endif %}
+          {% if es_admin %}
+            <a href="{% url 'editar_torneo' torneo.id %}" class="btn btn-warning">Editar</a>
+            <a href="{% url 'eliminar_torneo' torneo.id %}" class="btn btn-danger">Eliminar</a>
+          {% endif %}
+          <a href="{% url 'lista_torneos' %}" class="btn btn-outline-dark">Volver</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="card shadow mb-4">
+      <div class="card-header bg-secondary text-white"><h5 class="mb-0">Jugadores inscritos</h5></div>
+      <ul class="list-group list-group-flush">
+        {% for inscripcion in inscripciones %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ forloop.counter }}. {{ inscripcion.jugador.nickname }}</span>
+            <small class="text-muted">{{ inscripcion.fecha_inscripcion|date:"d/m/Y" }}</small>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">Aún no hay jugadores inscritos.</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="card shadow">
+      <div class="card-header bg-secondary text-white"><h5 class="mb-0">Resultados</h5></div>
+      <ul class="list-group list-group-flush">
+        {% for resultado in resultados %}
+          <li class="list-group-item d-flex justify-content-between">
+            <span>{{ forloop.counter }}. {{ resultado.jugador.nickname }}</span>
+            <strong>{{ resultado.puntaje }} pts</strong>
+          </li>
+        {% empty %}
+          <li class="list-group-item text-muted">Sin resultados registrados.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

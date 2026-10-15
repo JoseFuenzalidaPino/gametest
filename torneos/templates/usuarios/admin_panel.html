@@ -24,27 +24,28 @@
   </div>
   <div class="card-body">
     {% if torneos %}
-    <table class="table table-striped table-hover">
+    <div class="table-responsive">
+    <table class="table table-striped table-hover align-middle">
       <thead class="table-dark">
         <tr><th>Nombre</th><th>Videojuego</th><th>Fecha</th><th>Estado</th><th>Inscritos</th><th>Acciones</th></tr>
       </thead>
       <tbody>
         {% for torneo in torneos %}
         <tr>
-          <td>{{ torneo.nombre }}</td>
+          <td><a href="{% url 'detalle_torneo' torneo.id %}">{{ torneo.nombre }}</a></td>
           <td>{{ torneo.videojuego }}</td>
           <td>{{ torneo.fecha }}</td>
-          <td>{{ torneo.get_estado_display }}</td>
+          <td>{% include 'torneos/_estado_badge.html' %}</td>
           <td>{{ torneo.inscritos }} / {{ torneo.max_participantes }}</td>
-          <td>
+          <td class="text-nowrap">
             <a href="{% url 'editar_torneo' torneo.id %}" class="btn btn-warning btn-sm">Editar</a>
-            <a href="{% url 'eliminar_torneo' torneo.id %}" class="btn btn-danger btn-sm"
-               onclick="return confirm('¿Seguro que deseas eliminar este torneo?');">Eliminar</a>
+            <a href="{% url 'eliminar_torneo' torneo.id %}" class="btn btn-danger btn-sm">Eliminar</a>
           </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+    </div>
     {% else %}
     <div class="alert alert-info">No hay torneos registrados aún.</div>
     {% endif %}

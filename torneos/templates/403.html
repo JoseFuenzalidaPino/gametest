@@ -1,0 +1,11 @@
+{% extends 'torneos/base.html' %}
+{% block titulo %}Acceso denegado{% endblock %}
+
+{% block contenido %}
+<div class="text-center py-5">
+  <h1 class="display-4 fw-bold">403</h1>
+  <p class="lead">No tienes permisos para acceder a esta sección.</p>
+  <p class="text-muted">Esta acción está reservada para administradores.</p>
+  <a href="{% url 'lista_torneos' %}" class="btn btn-primary">Ver torneos</a>
+</div>
+{% endblock %}

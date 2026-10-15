@@ -10,22 +10,24 @@
   <div class="card-body">
     <h5>Mis inscripciones</h5>
     {% if inscripciones %}
-    <table class="table table-striped">
+    <div class="table-responsive">
+    <table class="table table-striped align-middle">
       <thead class="table-dark">
         <tr><th>Torneo</th><th>Videojuego</th><th>Fecha</th><th>Estado</th><th>Inscrito el</th></tr>
       </thead>
       <tbody>
         {% for inscripcion in inscripciones %}
         <tr>
-          <td>{{ inscripcion.torneo.nombre }}</td>
+          <td><a href="{% url 'detalle_torneo' inscripcion.torneo.id %}">{{ inscripcion.torneo.nombre }}</a></td>
           <td>{{ inscripcion.torneo.videojuego }}</td>
           <td>{{ inscripcion.torneo.fecha }}</td>
-          <td>{{ inscripcion.torneo.get_estado_display }}</td>
+          <td>{% include 'torneos/_estado_badge.html' with torneo=inscripcion.torneo %}</td>
           <td>{{ inscripcion.fecha_inscripcion|date:"d/m/Y H:i" }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+    </div>
     {% else %}
     <div class="alert alert-info">Aún no estás inscrito en ningún torneo.</div>
     {% endif %}

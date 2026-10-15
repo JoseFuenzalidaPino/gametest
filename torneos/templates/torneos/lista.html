@@ -42,14 +42,6 @@
                             </a>
                         {% endif %}
                     </td>
-
-                    <td>
-                        <a href="{% url 'editar_torneo' torneo.id %}" class="btn btn-warning btn-sm">Editar</a>
-                        <a href="{% url 'eliminar_torneo' torneo.id %}" class="btn btn-danger btn-sm"
-                           onclick="return confirm('¿Seguro que deseas eliminar este torneo?');">
-                           Eliminar
-                        </a>
-                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

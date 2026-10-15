@@ -1,0 +1,14 @@
+{% extends 'torneos/base.html' %}
+{% block titulo %}Aviso{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="alert alert-info text-center">{{ mensaje }}</div>
+    <div class="text-center">
+      <a href="{% url 'lista_torneos' %}" class="btn btn-primary">Volver a torneos</a>
+      <a href="{% url 'jugador_panel' %}" class="btn btn-outline-secondary">Mis inscripciones</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

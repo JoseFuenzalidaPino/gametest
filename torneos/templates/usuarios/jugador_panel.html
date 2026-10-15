@@ -1,0 +1,34 @@
+{% extends 'torneos/base.html' %}
+{% block titulo %}Mi Panel{% endblock %}
+
+{% block contenido %}
+<div class="card shadow">
+  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+    <h4 class="mb-0">Hola, {{ user.username }} 🎮</h4>
+    <a href="{% url 'lista_torneos' %}" class="btn btn-primary btn-sm">Ver torneos</a>
+  </div>
+  <div class="card-body">
+    <h5>Mis inscripciones</h5>
+    {% if inscripciones %}
+    <table class="table table-striped">
+      <thead class="table-dark">
+        <tr><th>Torneo</th><th>Videojuego</th><th>Fecha</th><th>Estado</th><th>Inscrito el</th></tr>
+      </thead>
+      <tbody>
+        {% for inscripcion in inscripciones %}
+        <tr>
+          <td>{{ inscripcion.torneo.nombre }}</td>
+          <td>{{ inscripcion.torneo.videojuego }}</td>
+          <td>{{ inscripcion.torneo.fecha }}</td>
+          <td>{{ inscripcion.torneo.get_estado_display }}</td>
+          <td>{{ inscripcion.fecha_inscripcion|date:"d/m/Y H:i" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info">Aún no estás inscrito en ningún torneo.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

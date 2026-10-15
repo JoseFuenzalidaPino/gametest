@@ -26,6 +26,11 @@ router.register(r'torneos', TorneoViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.inicio, name='inicio'),  # Página principal
+    path('login/', views.iniciar_sesion, name='login'),
+    path('registro/', views.registrar_usuario, name='registro'),
+    path('logout/', views.cerrar_sesion, name='logout'),
+    path('panel/', views.jugador_panel, name='jugador_panel'),
+    path('panel/admin/', views.admin_panel, name='admin_panel'),
     path('torneos/', include('torneos.urls')),  # CRUD tradicional
     path('api/', include(router.urls)),  # API REST
 ]

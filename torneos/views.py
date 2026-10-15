@@ -1,27 +1,36 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Torneo
-from .forms import TorneoForm
-from rest_framework import viewsets
-from .serializers import TorneoSerializer
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.models import User, Group
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User, Group
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from .models import Torneo, Inscripcion
+from django.db.models import Count
+from rest_framework import viewsets
+from .models import Torneo, Inscripcion, Jugador
+from .forms import TorneoForm
+from .serializers import TorneoSerializer
+
+
+def es_administrador(user):
+    return user.is_staff or user.groups.filter(name="Administrador").exists()
+
+
+def obtener_jugador(user):
+    jugador, _ = Jugador.objects.get_or_create(user=user, defaults={"nickname": user.username})
+    return jugador
+
 
 @login_required
 def inscribirse_torneo(request, torneo_id):
     torneo = get_object_or_404(Torneo, id=torneo_id)
-    jugador = request.user
+    jugador = obtener_jugador(request.user)
 
     if Inscripcion.objects.filter(torneo=torneo, jugador=jugador).exists():
         return render(request, 'torneos/mensaje.html', {'mensaje': 'Ya estás inscrito en este torneo.'})
 
+    if torneo.estado != 'DISPONIBLE':
+        return render(request, 'torneos/mensaje.html', {'mensaje': 'Este torneo no admite inscripciones.'})
+
     inscripciones_actuales = Inscripcion.objects.filter(torneo=torneo).count()
-    if inscripciones_actuales >= torneo.cupos_disponibles:
+    if inscripciones_actuales >= torneo.max_participantes:
         return render(request, 'torneos/mensaje.html', {'mensaje': 'No hay cupos disponibles.'})
 
     Inscripcion.objects.create(torneo=torneo, jugador=jugador)
@@ -30,36 +39,57 @@ def inscribirse_torneo(request, torneo_id):
 
 def registrar_usuario(request):
     if request.method == "POST":
-        username = request.POST["username"]
-        password = request.POST["password"]
+        username = request.POST.get("username", "").strip()
+        password = request.POST.get("password", "")
+        if not username or not password:
+            return render(request, "usuarios/registro.html", {"error": "Usuario y contraseña son obligatorios"})
         if User.objects.filter(username=username).exists():
             return render(request, "usuarios/registro.html", {"error": "El usuario ya existe"})
         user = User.objects.create_user(username=username, password=password)
-        grupo_jugador = Group.objects.get(name="Usuarios")  # asigna rol Jugador
+        grupo_jugador, _ = Group.objects.get_or_create(name="Usuarios")  # asigna rol Jugador
         user.groups.add(grupo_jugador)
-        return redirect("login")
+        obtener_jugador(user)
+        return render(request, "usuarios/login.html", {"exito": "Cuenta creada, ya puedes iniciar sesión"})
     return render(request, "usuarios/registro.html")
 
 def iniciar_sesion(request):
     mensaje = ""
     if request.method == "POST":
-        username = request.POST["username"]
-        password = request.POST["password"]
+        username = request.POST.get("username", "")
+        password = request.POST.get("password", "")
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            if user.groups.filter(name="Administrador").exists():
+            siguiente = request.POST.get("next") or request.GET.get("next")
+            if siguiente and siguiente.startswith("/") and not siguiente.startswith("//"):
+                return redirect(siguiente)
+            if es_administrador(user):
                 return redirect("admin_panel")   # si es admin, va a su panel
             else:
                 return redirect("jugador_panel") # si es jugador, va a su panel
         else:
             mensaje = "Usuario o contraseña incorrectos"
-    return render(request, "usuarios/login.html", {"mensaje": mensaje})
+    return render(request, "usuarios/login.html", {"mensaje": mensaje, "next": request.GET.get("next", "")})
 
-@login_required
 def cerrar_sesion(request):
     logout(request)
-    return redirect("login")
+    return redirect("inicio")
+
+@login_required
+def jugador_panel(request):
+    inscripciones = (Inscripcion.objects.filter(jugador__user=request.user)
+                     .select_related('torneo').order_by('torneo__fecha'))
+    return render(request, "usuarios/jugador_panel.html", {"inscripciones": inscripciones})
+
+@login_required
+@user_passes_test(es_administrador)
+def admin_panel(request):
+    torneos = Torneo.objects.annotate(inscritos=Count('inscripcion')).order_by('-fecha')
+    return render(request, "usuarios/admin_panel.html", {
+        "torneos": torneos,
+        "total_jugadores": Jugador.objects.count(),
+        "total_inscripciones": Inscripcion.objects.count(),
+    })
 
 class TorneoViewSet(viewsets.ModelViewSet):
     queryset = Torneo.objects.all()

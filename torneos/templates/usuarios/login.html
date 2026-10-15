@@ -1,0 +1,26 @@
+{% extends 'torneos/base.html' %}
+{% block titulo %}Iniciar Sesión{% endblock %}
+
+{% block contenido %}
+<div class="row justify-content-center">
+  <div class="col-md-5">
+    <div class="card shadow">
+      <div class="card-header bg-dark text-white">
+        <h4 class="mb-0">Iniciar Sesión</h4>
+      </div>
+      <div class="card-body">
+        {% if exito %}<div class="alert alert-success">{{ exito }}</div>{% endif %}
+        {% if mensaje %}<div class="alert alert-danger">{{ mensaje }}</div>{% endif %}
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}">
+          <input type="text" name="username" placeholder="Usuario" class="form-control mb-2" required>
+          <input type="password" name="password" placeholder="Contraseña" class="form-control mb-3" required>
+          <button type="submit" class="btn btn-primary w-100">Entrar</button>
+        </form>
+        <p class="text-center mt-3 mb-0">¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

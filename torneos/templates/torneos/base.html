@@ -21,6 +21,16 @@
                     <li class="nav-item"><a class="nav-link" href="/torneos/">Torneos</a></li>
                     <li class="nav-item"><a class="nav-link" href="/torneos/crear/">Crear Torneo</a></li>
                     <li class="nav-item"><a class="nav-link" href="/api/torneos/">API</a></li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'jugador_panel' %}">Mi Panel</a></li>
+                        {% if es_admin %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel' %}">Administración</a></li>
+                        {% endif %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar sesión ({{ user.username }})</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'registro' %}">Registrarse</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
